@@ -7,7 +7,7 @@ from modz.nameconvert import nameconvert
 from modz.gptRec import gptRec
 from modz.help import help
 from modz.ratingSystem import rateModeStart,rateModeContinue,RateMode,rateFilm
-from modz.pickSystem import pick,undopick
+from modz.pickSystem import pick,undopick,addimdb
 from modz.displayStats import displayStats, lastFive, leaderboard
 from modz.botsay import botsay, Botsay
 from modz.memberSeenAndPick import memberSeen
@@ -475,6 +475,12 @@ async def pick_func(interaction: discord.Interaction, film: str):
     except Exception as e:
         await botsayer.setChannel(interaction.channel).say(f"Error: {e}")
 
+@bot.tree.command(name="addimdb", description="adds a film to the imdb dataset (you probably don't want this)", guild=guild)
+async def addimdb_func(interaction: discord.Interaction, film: str):
+    try:
+        await addimdb(film,botsayer.setChannel(interaction.channel))
+    except Exception as e:
+        await botsayer.setChannel(interaction.channel).say(f"Error: {e}")
 
 @bot.tree.command(name="seen", description="print a summary of a club member's ratings", guild=guild)
 @discord.app_commands.choices(member=[discord.app_commands.Choice(name=string.capwords(member), value=member) for member in members])

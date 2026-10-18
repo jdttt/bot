@@ -14,6 +14,67 @@ def memberIDSelectSkeleton():
 def wildcardWrapForLIKE(s: str):
     return f"%{s.strip()}%"
 
+async def addimdb(film: str, botsayer: Botsay) -> str:
+    if film == "":
+        raise Exception("You didn't pick a film!")
+
+    # writing to newfilmdata
+    con = sqlite3.connect("filmdata.db")
+    cur = con.cursor()
+    try:
+        # getting the imdb data <== 11/10/24 10:28:28 # 
+        imdb_code = ""
+        reg = re.compile(r"tt[0-9]+")
+        imdb_url: str = ""
+        try:
+
+            try:
+                br = mechanicalsoup.StatefulBrowser()
+                br.open("http://google.com")
+                form = br.select_form()
+                form["q"] = f"{film} site:imdb.com"
+                form.choose_submit("btnI")
+                result = br.submit_selected()
+                imdb_url = result.url
+            except Exception as e:
+                await botsayer.say(f"Problem with fetching imdb data!")
+                raise e
+
+            try:
+                match_object = reg.search(imdb_url)
+                if match_object != None:
+                    imdb_code = f"{match_object.group()}"
+
+                    try:
+                        res = cur.execute("SELECT * FROM IMDb_ids WHERE imdb_id = ?;", (imdb_code,))
+                        result = res.fetchall()
+                        if len(result) > 0:
+                            await botsayer.say(f"IMDb link already in database: [{string.capwords(film)}](http://www.imdb.com/title/{imdb_code})!")
+                        else:
+                            cur.execute("INSERT INTO IMDb_ids (film_id, imdb_id) VALUES ((SELECT id FROM Films WHERE film_name = ?), ?);", (film.lower(),imdb_code))
+                            res = cur.execute("SELECT * FROM IMDb_ids WHERE imdb_id = ?;", (imdb_code,))
+                            result = res.fetchall()
+                            if len(result) > 0:
+                                await botsayer.say(f"IMDb link added to database: [{string.capwords(film)}](http://www.imdb.com/title/{imdb_code})!")
+                    except Exception as e:
+                        await botsayer.say(f"Problem with imdb data!")
+                        raise e
+
+            except Exception as e:
+                raise e
+
+        except Exception as e:
+            raise e
+
+    except Exception as e:
+        con.commit()
+        con.close()
+        await botsayer.say(f"Error: {e}")
+
+    con.commit()
+    con.close()
+    return ""
+
 async def pick(picker: str, film: str, botsayer: Botsay) -> str:
     if film == "":
         raise Exception("You didn't pick a film!")
