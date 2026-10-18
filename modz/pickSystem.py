@@ -1,5 +1,5 @@
 import csv, os, string, sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from .updateFile import updateFile
 from .botsay import Botsay
 import mechanicalsoup, re
@@ -38,7 +38,7 @@ async def pick(picker: str, film: str, botsayer: Botsay) -> str:
         res = cur.execute("SELECT * FROM Films WHERE film_name LIKE ?;", (wildcardWrapForLIKE(film.lower()),))
         result = res.fetchall()
         if len(result) > 0:
-            await botsayer.say(f"Film already in database: {string.capwords(film)}!")
+            await botsayer.say(f"Film is in database (maybe because it's been picked before): {string.capwords(film)}!")
         else:
             cur.execute("INSERT INTO Films (film_name) VALUES (?);", (film.lower(),))
             res = cur.execute("SELECT * FROM Films WHERE film_name LIKE ?;", (wildcardWrapForLIKE(film.lower()),))
@@ -114,24 +114,22 @@ async def pick(picker: str, film: str, botsayer: Botsay) -> str:
 async def undopick(picker: str, botsayer: Botsay) -> str:
     con = sqlite3.connect("filmdata.db")
     cur = con.cursor()
-    dateint = int(datetime.today().strftime("%Y%m%d"))
-    res = cur.execute(f"SELECT * FROM Pickers WHERE user_id = {memberIDSelectSkeleton()} AND date = ?", (picker,dateint,))
+    dateint = int((datetime.today() - timedelta(days=2)).strftime("%Y%m%d"))
+    res = cur.execute(f"SELECT * FROM Pickers WHERE user_id = {memberIDSelectSkeleton()} AND date > ?", (picker,dateint,))
     results = res.fetchall()
     response = ""
     try:
         if len(results) > 0:
-            cur.execute(f"DELETE FROM Films WHERE id IN (SELECT film_id FROM Pickers WHERE date = ? AND user_id = {memberIDSelectSkeleton()})", (dateint,picker,))
-            cur.execute(f"DELETE FROM Pickers WHERE user_id = {memberIDSelectSkeleton()} AND date = ?", (picker,dateint,))
-            cur.execute(f"DELETE FROM IMDb_ids WHERE film_id NOT IN (SELECT id FROM Films)")
-            res = cur.execute(f"SELECT * FROM Pickers WHERE user_id = {memberIDSelectSkeleton()} AND date = ?", (picker,dateint,))
+            cur.execute(f"DELETE FROM Pickers WHERE user_id = {memberIDSelectSkeleton()} AND date > ?", (picker,dateint,))
+            res = cur.execute(f"SELECT * FROM Pickers WHERE user_id = {memberIDSelectSkeleton()} AND date > ?", (picker,dateint,))
             results = res.fetchall()
             if len(results) == 0:
-                response = "Deleted all your picks from today!"
+                response = "Deleted all your picks from yesterday or today!"
             else:
-                raise Exception("Some kinda problemo deleting picks!")
+                raise Exception("Tried to delete picks but failed!")
         else:
-            cur.execute(f"DELETE FROM IMDb_ids WHERE film_id NOT IN (SELECT id FROM Films)")
-            response = "No picks today to delete! (To delete older picks, contact Justin.)"
+            response = "No picks from yesterday or today to delete! (To delete older picks, contact Justin.)"
+
     except Exception as e:
         con.commit()
         con.close()
