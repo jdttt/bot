@@ -4,7 +4,6 @@ import random,mechanicalsoup,string,sqlite3,datetime
 from discord.ext import commands
 from modz.emoji import discord_emojis
 from modz.nameconvert import nameconvert
-from modz.gptRec import gptRec
 from modz.help import help
 from modz.ratingSystem import rateModeStart,rateModeContinue,RateMode,rateFilm
 from modz.pickSystem import pick,undopick,addimdb
@@ -560,7 +559,6 @@ async def on_message(message: discord.Message):
     guild = message.guild
     channel = message.channel
     mess: str = message.content.lower()
-    await gptRec(message)
     await buttonTest(message)
     await help(message)
 
