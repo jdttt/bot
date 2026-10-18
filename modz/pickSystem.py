@@ -35,13 +35,16 @@ async def pick(picker: str, film: str, botsayer: Botsay) -> str:
                 raise Exception("Problem adding a new member!")
 
         # adding the film <== 10/07/24 10:25:59 # 
-        cur.execute("INSERT INTO Films (film_name) VALUES (?);", (film.lower(),))
         res = cur.execute("SELECT * FROM Films WHERE film_name LIKE ?;", (wildcardWrapForLIKE(film.lower()),))
         result = res.fetchall()
         if len(result) > 0:
-            await botsayer.say(f"Added film data: {string.capwords(film)}!")
+            await botsayer.say(f"Film already in database: {string.capwords(film)}!")
         else:
-            raise Exception(f"Error: problem adding {film}!")
+            cur.execute("INSERT INTO Films (film_name) VALUES (?);", (film.lower(),))
+            res = cur.execute("SELECT * FROM Films WHERE film_name LIKE ?;", (wildcardWrapForLIKE(film.lower()),))
+            result = res.fetchall()
+            if len(result) > 0:
+                await botsayer.say(f"Film added to database: {string.capwords(film)}!")
 
         # set the picker <== 10/07/24 10:54:55 # 
         dateint = int(datetime.today().strftime("%Y%m%d"))
@@ -59,6 +62,7 @@ async def pick(picker: str, film: str, botsayer: Botsay) -> str:
         reg = re.compile(r"tt[0-9]+")
         imdb_url: str = ""
         try:
+
             try:
                 br = mechanicalsoup.StatefulBrowser()
                 br.open("http://google.com")
@@ -77,24 +81,24 @@ async def pick(picker: str, film: str, botsayer: Botsay) -> str:
                     imdb_code = f"{match_object.group()}"
 
                     try:
-                        cur.execute("INSERT INTO IMDb_ids (film_id, imdb_id) VALUES ((SELECT id FROM Films WHERE film_name = ?), ?);", (film.lower(),imdb_code))
                         res = cur.execute("SELECT * FROM IMDb_ids WHERE imdb_id = ?;", (imdb_code,))
                         result = res.fetchall()
                         if len(result) > 0:
-                            await botsayer.say(f"Added imdb link: [{string.capwords(film)}](http://www.imdb.com/title/{imdb_code})!")
+                            await botsayer.say(f"IMDb link already in database: [{string.capwords(film)}](http://www.imdb.com/title/{imdb_code})!")
                         else:
-                            raise Exception(f"Error: problem adding imdb data for {string.capwords(film)}!")
+                            cur.execute("INSERT INTO IMDb_ids (film_id, imdb_id) VALUES ((SELECT id FROM Films WHERE film_name = ?), ?);", (film.lower(),imdb_code))
+                            res = cur.execute("SELECT * FROM IMDb_ids WHERE imdb_id = ?;", (imdb_code,))
+                            result = res.fetchall()
+                            if len(result) > 0:
+                                await botsayer.say(f"IMDb link added to database: [{string.capwords(film)}](http://www.imdb.com/title/{imdb_code})!")
                     except Exception as e:
-                        await botsayer.say(f"Failure inserting imdb data into database!")
+                        await botsayer.say(f"Problem with imdb data!")
                         raise e
 
             except Exception as e:
                 raise e
 
         except Exception as e:
-            con.commit()
-            con.close()
-            await botsayer.say(f"Error: {e}")
             raise e
 
     except Exception as e:
@@ -104,7 +108,6 @@ async def pick(picker: str, film: str, botsayer: Botsay) -> str:
 
     con.commit()
     con.close()
-
     return ""
 
 
