@@ -63,10 +63,20 @@ async def memberSeen(membername: str, film: str, botsayer: Botsay):
             while True:
                 result = f"**{string.capwords(membername)}'s {numToRating(rategroup).capitalize()} Films**\n"
                 while row_index < length_of_returned_table and rateseek == rategroup:
+                    # adding to result
                     if film_names_and_ratings_raw[row_index][0] in imdb_dicts.keys():
                         result = result+f"[{string.capwords(film_names_and_ratings_raw[row_index][0])}](<http://www.imdb.com/title/{imdb_dicts[film_names_and_ratings_raw[row_index][0]]}>)\n"
                     else:
                         result = result+f"{string.capwords(film_names_and_ratings_raw[row_index][0])}\n"
+                    # sending (partial) result if it's getting too large for a single discord message
+                    if len(result) > 1500:
+                        try:
+                            print(result)
+                        except:
+                            print("Problem printing result to console!")
+                        await botsayer.say(result)
+                        result = ""
+                    # moving to the next row
                     row_index += 1
                     try:
                         rateseek = film_names_and_ratings_raw[row_index][1]
