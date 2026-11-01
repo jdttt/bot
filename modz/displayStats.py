@@ -145,8 +145,6 @@ async def leaderboard(botsayer: Botsay):
         else:
             break
 
-    # now doing member averages
-
 
 async def displayStats(mess, botsay, channel):
 
