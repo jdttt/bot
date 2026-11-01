@@ -476,6 +476,7 @@ async def pick_func(interaction: discord.Interaction, film: str):
 
 @bot.tree.command(name="addimdb", description="adds a film to the imdb dataset (you probably don't want this)", guild=guild)
 async def addimdb_func(interaction: discord.Interaction, film: str):
+    await interaction.response.send_message(f"{random.choice(["ooh", "ahh", "wut...", "hey!", "noice!", "dank?", "i did it", "holy smokers", "looky here", "yo...", "i remember i think", "say huh", "poop!", "i honked on it", "it's time...", "don't get all weird", "something is stankin"]).capitalize()} {random.choice(discord_emojis)}")
     try:
         await addimdb(film,botsayer.setChannel(interaction.channel))
     except Exception as e:
