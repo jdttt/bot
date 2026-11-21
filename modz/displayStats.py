@@ -61,19 +61,23 @@ def intToDateString(i: int) -> str:
 def lastFive() -> str:
     con = sqlite3.connect("filmdata.db")
     cur = con.cursor()
-    res = cur.execute("SELECT film_name, name, date, imdb_id FROM Members, Films, Pickers, IMDb_ids WHERE Films.id = Pickers.film_id AND \
-        Members.id = Pickers.user_id AND IMDb_ids.film_id = Films.id ORDER BY Pickers.id DESC LIMIT 5;")
+    res = cur.execute("SELECT Films.id, film_name, name, date FROM Members, Films, Pickers WHERE Films.id = Pickers.film_id AND Members.id = Pickers.user_id AND ORDER BY Pickers.id DESC LIMIT 5;")
     films_raw = res.fetchall()
+    res = cur.execute("SELECT film_id, imdb_id FROM IMDb_ids;")
+    imdb_ids = dict(res.fetchall())
+
     con.close()
+
     class Counter:
         _count = 0
         def count(self, something):
             self._count += 1
             return self._count
     counter = Counter()
+
     films = "**Last Five Picks**\n"
-    films = films + '\n'.join(list(f"{counter.count(x)}. [{string.capwords(x[0])}](<http://www.imdb.com/title/{x[3]}>) :film_frames: picked by {string.capwords(x[1])} on \
-        {(lambda x: "the day time began" if x == 0 else intToDateString(x))(x[2])}." for x in films_raw))
+    films = films + '\n'.join(list(f"{counter.count(x)}. [{string.capwords(x[1])}](<http://www.imdb.com/title/{imdb_ids.get(x[0],0)}>) :film_frames: picked by {string.capwords(x[1])} on {(lambda x: "the day time began" if x == 0 else intToDateString(x))(x[3])}." for x in films_raw))
+
     # using regex to reduce consecutive whitespace chars to a single space <== 11/10/24 11:37:50 # 
     reggy = re.compile(r'[\s]{2,}')
     return reggy.sub(' ',films)
@@ -88,11 +92,11 @@ async def leaderboard(botsayer: Botsay):
     con.close()
     film_dicts: dict[str,list[int]] = {}
     imdb_dicts: dict[str,int] = {}
-    for film_rating_tup in film_rating_raw:
+    for raw_film_rating_tup in film_rating_raw:
         try: 
-            film_dicts[film_rating_tup[0]].append(film_rating_tup[1])
+            film_dicts[raw_film_rating_tup[0]].append(raw_film_rating_tup[1])
         except:
-            film_dicts[film_rating_tup[0]] = [film_rating_tup[1]]
+            film_dicts[raw_film_rating_tup[0]] = [raw_film_rating_tup[1]]
     
     for imdb_rating_tup in imdb_rating_raw:
         imdb_dicts[imdb_rating_tup[0]] = imdb_rating_tup[1]
