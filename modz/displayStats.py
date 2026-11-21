@@ -76,7 +76,7 @@ def lastFive() -> str:
     counter = Counter()
 
     films = "**Last Five Picks**\n"
-    films = films + '\n'.join(list(f"{counter.count(x)}. [{string.capwords(x[1])}](<http://www.imdb.com/title/{imdb_ids.get(x[0],0)}>) :film_frames: picked by {string.capwords(x[1])} on {(lambda x: "the day time began" if x == 0 else intToDateString(x))(x[3])}." for x in films_raw))
+    films = films + '\n'.join(list(f"{counter.count(x)}. [{string.capwords(x[1])}](<http://www.imdb.com/title/{imdb_ids.get(x[0],0)}>) :film_frames: picked by {string.capwords(x[2])} on {(lambda x: "the day time began" if x == 0 else intToDateString(x))(x[3])}." for x in films_raw))
 
     # using regex to reduce consecutive whitespace chars to a single space <== 11/10/24 11:37:50 # 
     reggy = re.compile(r'[\s]{2,}')
