@@ -61,7 +61,7 @@ def intToDateString(i: int) -> str:
 def lastFive() -> str:
     con = sqlite3.connect("filmdata.db")
     cur = con.cursor()
-    res = cur.execute("SELECT Films.id, film_name, name, date FROM Members, Films, Pickers WHERE Films.id = Pickers.film_id AND Members.id = Pickers.user_id AND ORDER BY Pickers.id DESC LIMIT 5;")
+    res = cur.execute("SELECT Films.id, film_name, name, date FROM Members, Films, Pickers WHERE Films.id = Pickers.film_id AND Members.id = Pickers.user_id ORDER BY Pickers.id DESC LIMIT 5;")
     films_raw = res.fetchall()
     res = cur.execute("SELECT film_id, imdb_id FROM IMDb_ids;")
     imdb_ids = dict(res.fetchall())
