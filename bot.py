@@ -104,6 +104,10 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 guild = discord.Object(id=848303003199209532)
 
+async def random_quick_response():
+    await interaction.response.send_message(f"{random.choice(["titty titty", "mcgurgen", "my wife!", "i miss the bk broiler", "is this a fat?", "i honked on it", "it's a... touch it", "my wife got all weird", "is stankin: is you", "i don't have a donger", "my weasel ran me"]).capitalize()} {random.choice(discord_emojis)}")
+    return
+
 async def films_autocomplete(interaction: discord.Interaction, current: str,) -> list[discord.app_commands.Choice[str]]:
     con = FDCon()
     films = []
@@ -475,8 +479,9 @@ async def pick_func(interaction: discord.Interaction, film: str):
         await botsayer.setChannel(interaction.channel).say(f"Error: {e}")
 
 @bot.tree.command(name="addimdb", description="adds a film to the imdb dataset (you probably don't want this)", guild=guild)
+@discord.app_commands.autocomplete(film=films_autocomplete)
 async def addimdb_func(interaction: discord.Interaction, film: str):
-    await interaction.response.send_message(f"{random.choice(["ooh", "ahh", "wut...", "hey!", "noice!", "dank?", "i did it", "holy smokers", "looky here", "yo...", "i remember i think", "say huh", "poop!", "i honked on it", "it's time...", "don't get all weird", "something is stankin"]).capitalize()} {random.choice(discord_emojis)}")
+    await random_quick_response()
     try:
         await addimdb(film,botsayer.setChannel(interaction.channel))
     except Exception as e:
@@ -486,7 +491,7 @@ async def addimdb_func(interaction: discord.Interaction, film: str):
 @discord.app_commands.choices(member=[discord.app_commands.Choice(name=string.capwords(member), value=member) for member in members])
 @discord.app_commands.autocomplete(film=seen_picks_autocomplete)
 async def seen(interaction: discord.Interaction, member: str, film: str):
-    await interaction.response.send_message(f"{random.choice(["ooh", "ahh", "wut...", "hey!", "noice!", "dank?", "i did it", "holy smokers", "looky here", "yo...", "i remember i think", "say huh", "poop!", "i honked on it", "it's time...", "don't get all weird", "something is stankin"]).capitalize()} {random.choice(discord_emojis)}")
+    await random_quick_response()
     await memberSeen(member, film, botsayer.setChannel(interaction.channel))
 
 

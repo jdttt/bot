@@ -44,17 +44,25 @@ def getimdb(name, limit=1) -> list[Film]:
 async def addimdb(film: str, botsayer: Botsay):
     if film == "":
         raise Exception("Empty string sent to addimdb!")
+        return
 
     if film.startswith("tt"):
         imdb_code = film
     else:
+        con = sqlite3.connect("filmdata.db")
+        cur = con.cursor()
+        res = cur.execute("SELECT * FROM Films WHERE film_name LIKE ?;", (wildcardWrapForLIKE(film.lower()),))
+        result = res.fetchall()
+        con.close()
+        if len(result) == 0:
+            await botsayer.say(f"Film not yet in filmclub database!")
+            return
         imdb_code = getimdb(film)[0].get("id","0")
 
     if imdb_code == "0":
         await botsayer.say("Could not fetch imdb code from film name; manual entry needed!")
         return 
 
-    # writing to newfilmdata
     con = sqlite3.connect("filmdata.db")
     cur = con.cursor()
     try:
