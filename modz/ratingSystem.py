@@ -65,7 +65,7 @@ def ratingToInt(rating: str):
         case "a+": return 13
         case _: raise Exception("Bad rating passed to ratingToInt")
 
-def _rateFilm(film_id: int, user_id: int, rating: int | float):
+def _insert_rating_into_sql(film_id: int, user_id: int, rating: int | float):
     con = sqlite3.connect("filmdata.db")
     cur = con.cursor()
     res = cur.execute("SELECT * FROM Ratings WHERE film_id = ? AND user_id = ?", (film_id,user_id,))
@@ -117,8 +117,6 @@ async def container(mess, botsayer):
             return
 
 async def rateFilm(user: str, film: str, rating: int | float) -> str:
-    # send the rating to the database
-
     # getting user_id
     try:
         user_id = getUserID(user)
@@ -138,7 +136,7 @@ async def rateFilm(user: str, film: str, rating: int | float) -> str:
     # inserting rating
     try:
         film_id = getFilmID(film)
-        _rateFilm(film_id,user_id,rating)
+        _insert_rating_into_sql(film_id,user_id,rating)
     except Exception as e:
         raise e
 
@@ -193,7 +191,7 @@ async def rateModeContinue(ratemode: RateMode,
         try:
             film_id = getFilmID(ratemode[author].nowrating)
             user_id = getUserID(author)
-            _rateFilm(film_id,user_id,rating)
+            _insert_rating_into_sql(film_id,user_id,rating)
         except Exception as e:
             await botsayer.say(f"Error: {e}")
             tryprint(f"Error: {e}")
