@@ -4,6 +4,7 @@ import random,mechanicalsoup,string,sqlite3,datetime
 from discord.ext import commands
 from modz.emoji import discord_emojis
 from modz.nameconvert import nameconvert
+from modz.numToRating import numToRating
 from modz.help import help
 from modz.ratingSystem import rateModeStart,rateModeContinue,RateMode,rateFilm
 from modz.pickSystem import pick,undopick,addimdb
