@@ -145,7 +145,7 @@ async def rateFilm(user: str, film: str, rating: int | float) -> str:
     # returning a success message to post
     try: 
         rating = getRating(user_id,film_id)
-        return f"{user.title()} has given {string.capwords(film)} a rating of {numToRating(rating).title()}."
+        return f"{user.title()} has given {string.capwords(film)} a rating of {numToRating(rating).title()}, {(rating/13)*10} out of 10."
     except Exception as e:
         raise e
 
