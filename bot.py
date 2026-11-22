@@ -484,10 +484,8 @@ def deccy(num):
     return num%1
 def nicenum(num):
     num = (num/12)*10
-    if num == 0:
-        return "0"
-    if num == 10:
-        return "10"
+    if num%1 == 0:
+        return f"{num}"
     if num < 1:
         return f"{Fraction(deccy(num)).limit_denominator()}"
     if num > 1: 
