@@ -15,4 +15,4 @@ def numToRating(num):
         case 11: return "A-"
         case 12: return "A"
         case 13: return "A+"
-        case _: return "ERROR"
+        case _: return f"{(num/13)*10}"
