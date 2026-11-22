@@ -482,9 +482,18 @@ def whole(num):
     return num - num%1
 def deccy(num):
     return num%1
+def nicenum(num):
+    num = (num/12)*10
+    if num == 0:
+        return "0"
+    if num < 1:
+        return f"{Fraction(deccy(num)).limit_denominator()}"
+    if num > 1: 
+        return f"{int(whole(num))} {Fraction(deccy(num)).limit_denominator()}"
+
 @bot.tree.command(name="scale", description="find where a grade falls on the 10 point scale", guild=guild)
 async def rate(interaction: discord.Interaction):
-    await interaction.response.send_message('\n'.join([f"{numToRating(x+1)} starts at {whole((x/12)*10)} {Fraction(deccy(((x)/12)*10)).limit_denominator()}." for x in range(0,13)]))
+    await interaction.response.send_message('\n'.join([f"{numToRating(x+1)} starts at {nicenum(x)}." for x in range(0,13)]))
 
 @bot.tree.command(name="rate", description="rate a film that was watched on a movie night", guild=guild)
 @discord.app_commands.autocomplete(film=picks_autocomplete)
