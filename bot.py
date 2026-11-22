@@ -478,9 +478,8 @@ async def realrate(interaction: discord.Interaction, film: str, rating: float):
     await interaction.response.send_message(response)
 
 @bot.tree.command(name="scale", description="find where a grade falls on the 10 point scale", guild=guild)
-@discord.app_commands.choices(rating=ratings)
-async def rate(interaction: discord.Interaction, rating: discord.app_commands.Choice[int]):
-    await interaction.response.send_message(f"{numToRating(rating.value)} starts at {((rating.value-1)/12)*10}.")
+async def rate(interaction: discord.Interaction):
+    await interaction.response.send_message('\n'.join([f"{numToRating(x)} starts at {((x)/12)*10}." for x in range(1,11)]))
 
 @bot.tree.command(name="rate", description="rate a film that was watched on a movie night", guild=guild)
 @discord.app_commands.autocomplete(film=picks_autocomplete)
