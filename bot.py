@@ -485,7 +485,7 @@ def deccy(num):
 def nicenum(num):
     num = (num/12)*10
     if num%1 == 0:
-        return f"{num}"
+        return f"{int(num)}"
     if num < 1:
         return f"{Fraction(deccy(num)).limit_denominator()}"
     if num > 1: 
