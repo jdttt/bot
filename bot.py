@@ -459,6 +459,23 @@ async def rand(interaction: discord.Interaction,visibility: int):
     except Exception as e:
         await interaction.response.send_message(f"Error: {e}")
 
+@bot.tree.command(name="realrate", description="use a real number between one and ten to rate a film", guild=guild)
+@discord.app_commands.autocomplete(film=picks_autocomplete)
+async def realrate(interaction: discord.Interaction, film: str, rating: float):
+    if not 0 <= rating <= 10:
+        await interaction.response.send_message("Your rating must be a number between 0 and 10.")
+        return
+
+    # converting to the 13 scale
+    rating = (rating/10)*13
+
+    try:
+        response = await rateFilm(nameconvert(interaction.user.name),film,rating)
+    except Exception as e:
+        await interaction.response.send_message(f"Error: {e}", ephemeral=True)
+        return
+    await interaction.response.send_message(response)
+
 @bot.tree.command(name="rate", description="rate a film that was watched on a movie night", guild=guild)
 @discord.app_commands.autocomplete(film=picks_autocomplete)
 @discord.app_commands.choices(rating=ratings)

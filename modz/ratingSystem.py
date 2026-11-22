@@ -65,21 +65,27 @@ def ratingToInt(rating: str):
         case "a+": return 13
         case _: raise Exception("Bad rating passed to ratingToInt")
 
-def _rateFilm(film_id: int, user_id: int, rating: int):
+def _rateFilm(film_id: int, user_id: int, rating: int | float):
     con = sqlite3.connect("filmdata.db")
     cur = con.cursor()
     res = cur.execute("SELECT * FROM Ratings WHERE film_id = ? AND user_id = ?", (film_id,user_id,))
     resultList = res.fetchall()
 
+    # calling UPDATE if the user already has a rating set
     if len(resultList) > 0:
         cur.execute("UPDATE Ratings SET rating = ?, date = ? WHERE film_id = ? AND user_id = ?;", (rating,today(),film_id,user_id,))
         con.commit()
+
+    # calling INSERT if this is the first time the user has rated the film
     else:
         cur.execute("SELECT * FROM Pickers WHERE film_id = ?", (film_id,))
         if len(cur.fetchall()) < 1:
             raise Exception("Cannot rate a film that was never picked.")
+            return
         cur.execute("INSERT INTO Ratings (film_id,user_id,rating,date) VALUES (?,?,?,?)", (film_id,user_id,rating,today(),))
         con.commit()
+
+    # closing connection and returning
     con.close()
     return 
 
@@ -110,8 +116,10 @@ async def container(mess, botsayer):
                 " 'no rating'. If you haven't seen it please use 'X'.")
             return
 
-async def rateFilm(user: str, film: str, rating: int) -> str:
+async def rateFilm(user: str, film: str, rating: int | float) -> str:
     # send the rating to the database
+
+    # getting user_id
     try:
         user_id = getUserID(user)
     except Exception as e:
@@ -126,14 +134,18 @@ async def rateFilm(user: str, film: str, rating: int) -> str:
         except Exception as e:
             print(f"Error: {e}")
             raise e
+
+    # inserting rating
     try:
         film_id = getFilmID(film)
         _rateFilm(film_id,user_id,rating)
     except Exception as e:
         raise e
+
+    # returning a success message to post
     try: 
         rating = getRating(user_id,film_id)
-        return f"{user.title()} has given {string.capwords(film)} a rating of {numToRating(rating).title()}."
+        return f"{user.title()} has given {string.capwords(film)} a rating of {numToRating(rating).title()}, {(rating/13)*10} out of 10."
     except Exception as e:
         raise e
 
