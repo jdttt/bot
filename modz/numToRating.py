@@ -15,4 +15,4 @@ def numToRating(num):
         case 11: return "A-"
         case 12: return "A"
         case 13: return "A+"
-        case _: return f"{round(((num-1)/12)*10,3)} out of 10 (which is between {numToRating(num - num%1)} and {numToRating((num - num%1) + 1)})"
+        case _: return f"{round(((num-1)/12)*10,3)} out of 10 (which is higher than {numToRating(num - num%1)} but lower than {numToRating((num - num%1) + 1)})"
