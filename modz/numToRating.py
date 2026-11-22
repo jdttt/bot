@@ -15,4 +15,4 @@ def numToRating(num):
         case 11: return "A-"
         case 12: return "A"
         case 13: return "A+"
-        case _: return f"{round((num/13)*10,3)} out of 10"
+        case _: return f"{round((num/13)*10,3)} out of 10 (which is in the {numToRating(num - num%1)} bracket)"
