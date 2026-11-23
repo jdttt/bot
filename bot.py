@@ -463,12 +463,37 @@ async def rand(interaction: discord.Interaction,visibility: int):
 @bot.tree.command(name="realrate", description="use a real number between one and ten to rate a film", guild=guild)
 @discord.app_commands.autocomplete(film=picks_autocomplete)
 async def realrate(interaction: discord.Interaction, film: str, rating: float):
-    if not 0 <= rating <= 10:
-        await interaction.response.send_message("Your rating must be a real number between 0 and 10.")
+    if not 5 <= rating <= 10:
+        await interaction.response.send_message("Your rating must be a real number between 5 (F) and 10 (A+).")
         return
 
     # converting to the 13 scale
-    rating = 1+((rating/10)*12)
+        # case 1:  return "F"
+        # case 2:  return "D-"
+        # case 3:  return "D"
+        # case 4:  return "D+"
+        # case 5:  return "C-"
+        # case 6:  return "C"
+        # case 7:  return "C+"
+        # case 8:  return "B-"
+        # case 9: return "B"
+        # case 10: return "B+"
+        # case 11: return "A-"
+        # case 12: return "A"
+        # case 13: return "A+"
+    if rating < 6:
+        rating = (rating - 5)
+    elif rating < 9:
+        rating = (rating * 3) - 16
+    else:
+        rating = (rating * 2) - 7
+    # elif rating < 8:
+    #     rating = ((rating - 7)*3)+5
+    # elif rating < 9:
+    #     rating = ((rating - 8)*3)+8
+    # elif rating < 9:
+    #     rating = ((rating - 8)*3)+8
+
 
     try:
         response = await rateFilm(nameconvert(interaction.user.name),film,rating)

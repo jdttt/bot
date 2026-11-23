@@ -1,3 +1,13 @@
+def convert(num):
+    if num < 2:
+        num = num + 4
+    elif num < 11:
+        num = ((num - 2)/3)+6
+    else:
+        num = ((num - 11)/2)+9
+    return num
+
+
 def numToRating(num):
     match num:
         case -1:  return "UNSEEN"
@@ -15,4 +25,4 @@ def numToRating(num):
         case 11: return "A-"
         case 12: return "A"
         case 13: return "A+"
-        case _: return f"{round(((num-1)/12)*10,3)} out of 10 (which is higher than {numToRating(num - num%1)} but lower than {numToRating((num - num%1) + 1)})"
+        case _: return f"{round(convert(num),3)} (which is higher than {numToRating(num - num%1)} but lower than {numToRating((num - num%1) + 1)})"
