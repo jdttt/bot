@@ -526,7 +526,7 @@ def convert(num):
     return num
 @bot.tree.command(name="scale", description="find where a grade falls on the 10 point scale", guild=guild)
 async def rate(interaction: discord.Interaction):
-    await interaction.response.send_message('\n'.join([f"{numToRating(x+1)} starts at {convert(x)}." for x in range(0,13)]))
+    await interaction.response.send_message('\n'.join([f"{numToRating(x+1)} starts at {convert(x+1)}." for x in range(0,13)]))
 
 @bot.tree.command(name="rate", description="rate a film that was watched on a movie night", guild=guild)
 @discord.app_commands.autocomplete(film=picks_autocomplete)
