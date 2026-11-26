@@ -460,6 +460,17 @@ async def rand(interaction: discord.Interaction,visibility: int):
     except Exception as e:
         await interaction.response.send_message(f"Error: {e}")
 
+@bot.tree.command(name="goofy", description="use goofy capitalization", guild=guild)
+async def goofy(interaction: discord.Interaction, message: str):
+    message = message.lower()
+    chars = list(message)
+    for i, c in enumerate (chars):
+        if random.choice([0,1]) == 1:
+            chars[i] = str.upper(c)
+    message = "".join(chars)
+    await interaction.response.send_message(message)
+    return
+
 @bot.tree.command(name="realrate", description="use a real number between one and ten to rate a film", guild=guild)
 @discord.app_commands.autocomplete(film=picks_autocomplete)
 async def realrate(interaction: discord.Interaction, film: str, rating: float):
